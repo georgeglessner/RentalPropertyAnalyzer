@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title> Rent Analyzer </title>
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container class="fill-height" fluid>
+                    <v-row align="center" justify="center">
+                        <v-col cols="12" sm="8" md="4">
+                            <v-card class="elevation-12" elevation="24">
+                                <v-img class="align-end" src="logo.png">
+                                </v-img>
+                                <v-toolbar color="primary" dark flat>
+                                    <v-toolbar-title>Rental Property Analyzer</v-toolbar-title>
+                                    <v-spacer></v-spacer>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <v-form ref="form">
+                                        <v-text-field label="Purchase Price" v-model="purchasePrice"
+                                            prepend-icon="mdi-currency-usd" type="number">
+                                        </v-text-field>
+
+                                        <v-text-field label="Rent Price" v-model="rentPrice" prepend-icon="mdi-cash"
+                                            type="number">
+                                        </v-text-field>
+
+                                        <v-checkbox v-model="financed" :label="`Financed`">
+                                        </v-checkbox>
+
+                                        <v-text-field v-if="financed" label="Finance Amount" v-model="financedAmount"
+                                            prepend-icon="mdi-bank" type="number">
+
+
+                                        </v-text-field>
+
+                                        <v-text-field v-if="financed" label="Monthly Mortgage Payment"
+                                            v-model="mortgageAmount" prepend-icon="mdi-currency-usd-off" type="number">
+                                        </v-text-field>
+
+                                        <v-text-field label="Rehab Cost" v-model="rehabCost"
+                                            prepend-icon="mdi-bulldozer" type="number"></v-text-field>
+
+                                        <v-text-field label="Monthly Utilities" v-model="utilities"
+                                            prepend-icon="mdi-lightbulb" type="number"></v-text-field>
+
+                                        <v-text-field label="Monthly Management" v-model="management"
+                                            prepend-icon="mdi-account-group" type="number"></v-text-field>
+
+                                        <v-text-field label="Monthly Repairs" v-model="repairs"
+                                            prepend-icon="mdi-hammer-wrench" type="number"></v-text-field>
+
+                                        <v-text-field label="Monthly CapEx" v-model="capex"
+                                            prepend-icon="mdi-hammer-wrench" type="number"></v-text-field>
+
+                                        <v-text-field label="Monthly Vacancy Allowance" v-model="vacancy"
+                                            prepend-icon="mdi-cancel" type="number"></v-text-field>
+
+
+                                    </v-form>
+                                </v-card-text>
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="primary" @click="submit">Submit</v-btn>
+                                </v-card-actions>
+                                <v-simple-table v-if="submitted">
+                                    <template v-slot:default>
+                                        <tbody>
+                                            <tr>
+                                                <td>Monthly Cash Flow</td>
+                                                <td>${{cashFlow}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Monthly Costs</td>
+                                                <td>${{monthlyCosts}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Cash on Cash ROI</td>
+                                                <td>{{roi}}%</td>
+                                            </tr>
+                                        </tbody>
+                                    </template>
+                                </v-simple-table>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                purchasePrice: 0,
+                rentPrice: 0,
+                financed: 0,
+                financedAmount: 0,
+                mortgageAmount: 0,
+                rehabCost: 0,
+                utilities: 0,
+                management: 0,
+                repairs: 0,
+                capex: 0,
+                vacancy: 0,
+                submitted: false,
+                cashFlow: 0,
+                monthlyCosts: 0,
+                roi: 0,
+            },
+
+            methods: {
+                submit() {
+                    // calculations
+                    const moneyIn = this.financed ? ((parseFloat(this.purchasePrice) - parseFloat(this.financedAmount)) + parseFloat(this.rehabCost)) : parseFloat(this.purchasePrice) + parseFloat(this.rehabCost);
+                    this.monthlyCosts = parseFloat(this.mortgageAmount) + parseFloat(this.utilities) + parseFloat(this.management) + parseFloat(this.repairs) + parseFloat(this.capex) + parseFloat(this.vacancy);
+
+                    this.cashFlow = parseFloat(this.rentPrice) - parseFloat(this.monthlyCosts);
+                    cashRoi = (parseFloat(this.cashFlow) * 12) / parseFloat(moneyIn);
+
+                    this.roi = Math.round(cashRoi * 100);
+
+                    this.submitted = true;
+
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
