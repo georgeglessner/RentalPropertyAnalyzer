@@ -17,52 +17,56 @@
                     <v-row align="center" justify="center">
                         <v-col cols="12" sm="8" md="4">
                             <v-card class="elevation-12" elevation="24">
-                                <v-img class="align-end" src="logo.png">
-                                </v-img>
                                 <v-toolbar color="primary" dark flat>
                                     <v-toolbar-title>Rental Property Analyzer</v-toolbar-title>
                                     <v-spacer></v-spacer>
                                 </v-toolbar>
                                 <v-card-text>
                                     <v-form ref="form">
-                                        <v-text-field label="Purchase Price" v-model="purchasePrice"
-                                            prepend-icon="mdi-currency-usd" type="number">
+                                        <v-text-field label="Purchase Price" v-model="purchasePrice" id="purchasePrice"
+                                            prepend-icon="mdi-currency-usd" type="number"
+                                            @focus="$event.target.select()">
                                         </v-text-field>
 
                                         <v-text-field label="Rent Price" v-model="rentPrice" prepend-icon="mdi-cash"
-                                            type="number">
+                                            type="number" @focus="$event.target.select()">
                                         </v-text-field>
 
                                         <v-checkbox v-model="financed" :label="`Financed`">
                                         </v-checkbox>
 
                                         <v-text-field v-if="financed" label="Finance Amount" v-model="financedAmount"
-                                            prepend-icon="mdi-bank" type="number">
-
-
+                                            prepend-icon="mdi-bank" type="number" @focus="$event.target.select()">
                                         </v-text-field>
 
                                         <v-text-field v-if="financed" label="Monthly Mortgage Payment"
-                                            v-model="mortgageAmount" prepend-icon="mdi-currency-usd-off" type="number">
+                                            v-model="mortgageAmount" prepend-icon="mdi-currency-usd-off" type="number"
+                                            @focus="$event.target.select()">
                                         </v-text-field>
 
                                         <v-text-field label="Rehab Cost" v-model="rehabCost"
-                                            prepend-icon="mdi-bulldozer" type="number"></v-text-field>
+                                            prepend-icon="mdi-bulldozer" type="number" @focus="$event.target.select()">
+                                        </v-text-field>
 
                                         <v-text-field label="Monthly Utilities" v-model="utilities"
-                                            prepend-icon="mdi-lightbulb" type="number"></v-text-field>
+                                            prepend-icon="mdi-lightbulb" type="number" @focus="$event.target.select()">
+                                        </v-text-field>
 
                                         <v-text-field label="Monthly Management" v-model="management"
-                                            prepend-icon="mdi-account-group" type="number"></v-text-field>
+                                            prepend-icon="mdi-account-group" type="number"
+                                            @focus="$event.target.select()"></v-text-field>
 
                                         <v-text-field label="Monthly Repairs" v-model="repairs"
-                                            prepend-icon="mdi-hammer-wrench" type="number"></v-text-field>
+                                            prepend-icon="mdi-hammer-wrench" type="number"
+                                            @focus="$event.target.select()"></v-text-field>
 
                                         <v-text-field label="Monthly CapEx" v-model="capex"
-                                            prepend-icon="mdi-hammer-wrench" type="number"></v-text-field>
+                                            prepend-icon="mdi-hammer-wrench" type="number"
+                                            @focus="$event.target.select()"></v-text-field>
 
                                         <v-text-field label="Monthly Vacancy Allowance" v-model="vacancy"
-                                            prepend-icon="mdi-cancel" type="number"></v-text-field>
+                                            prepend-icon="mdi-cancel" type="number" @focus="$event.target.select()">
+                                        </v-text-field>
 
 
                                     </v-form>
@@ -70,6 +74,7 @@
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
                                     <v-btn color="primary" @click="submit">Submit</v-btn>
+                                    <v-btn color="primary" @click="reset">Reset</v-btn>
                                 </v-card-actions>
                                 <v-simple-table v-if="submitted">
                                     <template v-slot:default>
@@ -100,7 +105,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script>
-        new Vue({
+        let v = new Vue({
             el: '#app',
             vuetify: new Vuetify(),
             data: {
@@ -134,6 +139,13 @@
 
                     this.submitted = true;
 
+                },
+
+                reset() {
+                    Object.keys(v.$data).forEach((key) => {
+                        this[`${key}`] = 0;
+                    })
+                    this.submitted = false;
                 }
             }
         })
