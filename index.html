@@ -25,47 +25,51 @@
                                     <v-form ref="form">
                                         <v-text-field label="Purchase Price" v-model="purchasePrice" id="purchasePrice"
                                             prepend-icon="mdi-currency-usd" type="number"
-                                            @focus="$event.target.select()">
+                                            @focus="$event.target.select()" prefix="$">
                                         </v-text-field>
 
                                         <v-text-field label="Rent Price" v-model="rentPrice" prepend-icon="mdi-cash"
-                                            type="number" @focus="$event.target.select()">
+                                            type="number" @focus="$event.target.select()" prefix="$">
                                         </v-text-field>
 
                                         <v-checkbox v-model="financed" :label="`Financed`">
                                         </v-checkbox>
 
                                         <v-text-field v-if="financed" label="Finance Amount" v-model="financedAmount"
-                                            prepend-icon="mdi-bank" type="number" @focus="$event.target.select()">
+                                            prepend-icon="mdi-bank" type="number" @focus="$event.target.select()"
+                                            prefix="$">
                                         </v-text-field>
 
                                         <v-text-field v-if="financed" label="Monthly Mortgage Payment"
                                             v-model="mortgageAmount" prepend-icon="mdi-currency-usd-off" type="number"
-                                            @focus="$event.target.select()">
+                                            @focus="$event.target.select()" prefix="$">
                                         </v-text-field>
 
                                         <v-text-field label="Rehab Cost" v-model="rehabCost"
-                                            prepend-icon="mdi-bulldozer" type="number" @focus="$event.target.select()">
+                                            prepend-icon="mdi-bulldozer" type="number" @focus="$event.target.select()"
+                                            prefix="$">
                                         </v-text-field>
 
                                         <v-text-field label="Monthly Utilities" v-model="utilities"
-                                            prepend-icon="mdi-lightbulb" type="number" @focus="$event.target.select()">
+                                            prepend-icon="mdi-lightbulb" type="number" @focus="$event.target.select()"
+                                            prefix="$">
                                         </v-text-field>
 
                                         <v-text-field label="Monthly Management" v-model="management"
                                             prepend-icon="mdi-account-group" type="number"
-                                            @focus="$event.target.select()"></v-text-field>
+                                            @focus="$event.target.select()" prefix="$"></v-text-field>
 
                                         <v-text-field label="Monthly Repairs" v-model="repairs"
                                             prepend-icon="mdi-hammer-wrench" type="number"
-                                            @focus="$event.target.select()"></v-text-field>
+                                            @focus="$event.target.select()" prefix="$"></v-text-field>
 
                                         <v-text-field label="Monthly CapEx" v-model="capex"
                                             prepend-icon="mdi-hammer-wrench" type="number"
-                                            @focus="$event.target.select()"></v-text-field>
+                                            @focus="$event.target.select()" prefix="$"></v-text-field>
 
                                         <v-text-field label="Monthly Vacancy Allowance" v-model="vacancy"
-                                            prepend-icon="mdi-cancel" type="number" @focus="$event.target.select()">
+                                            prepend-icon="mdi-cancel" type="number" @focus="$event.target.select()"
+                                            prefix="$">
                                         </v-text-field>
 
 
@@ -125,7 +129,6 @@
                 monthlyCosts: 0,
                 roi: 0,
             },
-
             methods: {
                 submit() {
                     // calculations
@@ -147,7 +150,8 @@
                     })
                     this.submitted = false;
                 }
-            }
+            },
+           
         })
     </script>
 </body>
