@@ -97,6 +97,16 @@
                                             </v-text-field>
 
                                             <v-text-field
+                                                label="Yearly Property Tax / Insurance"
+                                                v-model="taxInsurance"
+                                                prepend-icon="mdi-shield-home"
+                                                type="number"
+                                                @focus="$event.target.select()"
+                                                prefix="$"
+                                            >
+                                            </v-text-field>
+
+                                            <v-text-field
                                                 label="Monthly Utilities"
                                                 v-model="utilities"
                                                 prepend-icon="mdi-lightbulb"
@@ -192,6 +202,7 @@
                     financedAmount: 0,
                     mortgageAmount: 0,
                     rehabCost: 0,
+                    taxInsurance: 0,
                     utilities: 0,
                     management: 0,
                     repairs: 0,
@@ -206,13 +217,13 @@
                     submit() {
                         // check to make sure no empty values
                         Object.keys(v.$data).forEach((key) => {
-                            if(this[`${key}`] == '') {
+                            if (this[`${key}`] == "") {
                                 this[`${key}`] = 0;
                             }
                         });
 
                         // clear out finance and mortgage amounts
-                        if(!this.financed) {
+                        if (!this.financed) {
                             this.financedAmount = 0;
                             this.mortgageAmount = 0;
                         }
@@ -225,6 +236,7 @@
                               parseFloat(this.rehabCost);
                         this.monthlyCosts =
                             parseFloat(this.mortgageAmount) +
+                            Math.round(parseFloat(this.taxInsurance) / 12) +
                             parseFloat(this.utilities) +
                             parseFloat(this.management) +
                             parseFloat(this.repairs) +
