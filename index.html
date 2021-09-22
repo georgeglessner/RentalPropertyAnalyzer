@@ -210,6 +210,12 @@
                                 this[`${key}`] = 0;
                             }
                         });
+
+                        // clear out finance and mortgage amounts
+                        if(!this.financed) {
+                            this.financedAmount = 0;
+                            this.mortgageAmount = 0;
+                        }
                         // calculations
                         const moneyIn = this.financed
                             ? parseFloat(this.purchasePrice) -
