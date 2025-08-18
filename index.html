@@ -18,6 +18,25 @@
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
         />
         <title>Rent Analyzer</title>
+        <style>
+            body {
+                background: #f5f5f5;
+            }
+            .v-card {
+                border-radius: 16px;
+            }
+            .v-toolbar-title {
+                font-weight: 500;
+                font-size: 1.3rem;
+            }
+            .v-card-actions {
+                justify-content: flex-end;
+            }
+            .v-simple-table td {
+                font-size: 1rem;
+                padding: 8px 12px;
+            }
+        </style>
     </head>
 
     <body>
@@ -154,14 +173,12 @@
                                             </v-text-field>
                                         </v-form>
                                     </v-card-text>
-                                    <v-card-actions>
-                                        <v-spacer></v-spacer>
-                                        <v-btn color="primary" @click="submit"
-                                            >Submit</v-btn
-                                        >
-                                        <v-btn color="primary" @click="reset"
-                                            >Reset</v-btn
-                                        >
+                                    <v-card-actions class="justify-center">
+                                        <v-btn color="primary" @click="submit">Submit</v-btn>
+                                        <v-btn color="primary" @click="reset">Reset</v-btn>
+                                        <v-btn color="secondary" @click="share" title="Copy shareable link">
+                                            <v-icon left>mdi-share-variant</v-icon>Share
+                                        </v-btn>
                                     </v-card-actions>
                                     <v-simple-table v-if="submitted">
                                         <template v-slot:default>
@@ -192,13 +209,32 @@
         <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
         <script>
+            // Helper: parse query params
+            function getParams() {
+                const params = {};
+                window.location.search.replace(/\??([^=&]+)=([^&]*)/g, (_, k, v) => {
+                    params[k] = decodeURIComponent(v);
+                });
+                return params;
+            }
+
+            // Helper: update URL params
+            function setParams(data) {
+                const keys = [
+                    "purchasePrice", "rentPrice", "financed", "financedAmount", "mortgageAmount",
+                    "rehabCost", "taxInsurance", "utilities", "management", "repairs", "capex", "vacancy"
+                ];
+                const params = keys.map(k => `${k}=${encodeURIComponent(data[k])}`).join("&");
+                window.history.replaceState({}, '', `?${params}`);
+            }
+
             let v = new Vue({
                 el: "#app",
                 vuetify: new Vuetify(),
                 data: {
                     purchasePrice: 0,
                     rentPrice: 0,
-                    financed: 0,
+                    financed: false,
                     financedAmount: 0,
                     mortgageAmount: 0,
                     rehabCost: 0,
@@ -213,21 +249,54 @@
                     monthlyCosts: 0,
                     roi: 0,
                 },
+                created() {
+                    // Load from URL params
+                    const params = getParams();
+                    let hasParams = false;
+                    Object.keys(this.$data).forEach(key => {
+                        if (params[key] !== undefined) {
+                            hasParams = true;
+                            if (typeof this[key] === "boolean") {
+                                this[key] = params[key] === "true";
+                            } else {
+                                this[key] = isNaN(params[key]) ? params[key] : Number(params[key]);
+                            }
+                        }
+                    });
+                    // If there are params, auto-submit
+                    if (hasParams) {
+                        this.submit();
+                    }
+                },
+                watch: {
+                    // Watch all relevant fields and update URL
+                    purchasePrice: 'updateUrl',
+                    rentPrice: 'updateUrl',
+                    financed: 'updateUrl',
+                    financedAmount: 'updateUrl',
+                    mortgageAmount: 'updateUrl',
+                    rehabCost: 'updateUrl',
+                    taxInsurance: 'updateUrl',
+                    utilities: 'updateUrl',
+                    management: 'updateUrl',
+                    repairs: 'updateUrl',
+                    capex: 'updateUrl',
+                    vacancy: 'updateUrl',
+                },
                 methods: {
+                    updateUrl() {
+                        setParams(this.$data);
+                    },
                     submit() {
-                        // check to make sure no empty values
-                        Object.keys(v.$data).forEach((key) => {
-                            if (this[`${key}`] == "") {
+                        Object.keys(this.$data).forEach((key) => {
+                            if (this[`${key}`] === "" || this[`${key}`] === null) {
                                 this[`${key}`] = 0;
                             }
                         });
-
-                        // clear out finance and mortgage amounts
                         if (!this.financed) {
                             this.financedAmount = 0;
                             this.mortgageAmount = 0;
                         }
-                        // calculations
                         const moneyIn = this.financed
                             ? parseFloat(this.purchasePrice) -
                               parseFloat(this.financedAmount) +
@@ -246,20 +315,43 @@
                         this.cashFlow =
                             parseFloat(this.rentPrice) -
                             parseFloat(this.monthlyCosts);
-                        cashRoi =
+                        let cashRoi =
                             (parseFloat(this.cashFlow) * 12) /
                             parseFloat(moneyIn);
 
-                        this.roi = Math.round(cashRoi * 100);
+                        this.roi = isFinite(cashRoi) ? Math.round(cashRoi * 100) : 0;
 
                         this.submitted = true;
+                        setParams(this.$data);
                     },
-
                     reset() {
-                        Object.keys(v.$data).forEach((key) => {
-                            this[`${key}`] = 0;
+                        Object.keys(this.$data).forEach((key) => {
+                            if (typeof this[key] === "boolean") {
+                                this[key] = false;
+                            } else {
+                                this[key] = 0;
+                            }
                         });
                         this.submitted = false;
+                        setParams(this.$data);
+                    },
+                    share() {
+                        // Copy current URL to clipboard
+                        const url = window.location.href;
+                        if (navigator.clipboard) {
+                            navigator.clipboard.writeText(url).then(() => {
+                                this.$vuetify.toast && this.$vuetify.toast.success('Link copied!');
+                            });
+                        } else {
+                            // fallback for older browsers
+                            const temp = document.createElement('input');
+                            temp.value = url;
+                            document.body.appendChild(temp);
+                            temp.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(temp);
+                        }
+                        alert('Shareable link copied to clipboard!');
                     },
                 },
             });
